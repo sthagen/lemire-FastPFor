@@ -30,9 +30,7 @@ struct algostats {
   std::string name() {
     // if SIMDDeltas is "true", we prepend @
     if (SIMDDeltas) {
-      std::ostringstream convert;
-      convert << "@" << algo->name();
-      return convert.str();
+      return "@" + algo->name();
     }
     return algo->name();
   }
@@ -61,7 +59,7 @@ struct algostats {
   bool SIMDDeltas;
 };
 
-void summarize(std::vector<algostats> &v, std::string prefix = "#") {
+inline void summarize(std::vector<algostats> &v, std::string prefix = "#") {
   if (v.empty())
     return;
   std::cout << "# building summary " << std::endl;

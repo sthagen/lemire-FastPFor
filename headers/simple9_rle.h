@@ -78,14 +78,18 @@
 
 namespace FastPForLib {
 
+// --------------------------- selector code:  0,  1,  2,  3,  4,  5,  6,  7,
+//                                             8,  9,  A,  B,  C,  D,  E,  F
+static const uint32_t Simple9_Codec_intNumber[] = { 28, 14, 9, 7, 5, 4, 3, 2,
+                                                     1,  1, 1, 1, 1, 1, 1, 1 };
+
+static const uint32_t Simple9_Codec_bitLength[] = { 1,  2,  3,  4,  5,  7,  9, 14,
+                                                   31, 31, 31, 31, 31, 31, 31, 31 };
+
 /***************************************
 ********** Simple9-like codec **********
 ****************************************/
 class Simple9_Codec {
-
-  static const uint32_t intNumber[];
-  static const uint32_t bitLength[];
-
   static const uint32_t SIMPLE9_BITSIZE = 28;
   static const uint32_t SIMPLE9_MAXCODE = 8;
 
@@ -146,8 +150,8 @@ public:
         // try all the bit packing possibilities
         uint32_t code = SIMPLE9_MINCODE;
         for (; code < SIMPLE9_MAXCODE; code++) {
-          uint32_t intNum = intNumber[code];
-          uint32_t bitLen = bitLength[code];
+          uint32_t intNum = Simple9_Codec_intNumber[code];
+          uint32_t bitLen = Simple9_Codec_bitLength[code];
           intNum = (intNum < remainingCount) ? intNum : remainingCount;
 
           uint32_t maxVal = (1U << bitLen) - 1;
@@ -209,8 +213,8 @@ public:
 #endif
       else {
         // decode bit-packed integers
-        uint32_t intNum = intNumber[code];
-        uint32_t bitLen = bitLength[code];
+        uint32_t intNum = Simple9_Codec_intNumber[code];
+        uint32_t bitLen = Simple9_Codec_bitLength[code];
         uint32_t bitMask = (1U << bitLen) - 1;
         intNum = (intNum < remainingCount)
                      ? intNum
@@ -253,13 +257,6 @@ public:
   }
 };
 
-// --------------------------- selector code:  0,  1,  2,  3,  4,  5,  6,  7,
-// 8,  9,  A,  B,  C,  D,  E,  F
-const uint32_t Simple9_Codec::intNumber[] = {28, 14, 9, 7, 5, 4, 3, 2,
-                                             1,  1,  1, 1, 1, 1, 1, 1};
-const uint32_t Simple9_Codec::bitLength[] = {1,  2,  3,  4,  5,  7,  9,  14,
-                                             31, 31, 31, 31, 31, 31, 31, 31};
-
 /**
 * If MarkLength is true, than the number of symbols is written
 * in the stream. Otherwise you need to specify it using the nvalue
@@ -279,7 +276,7 @@ public:
     nvalue = count;
   }
 
-  const uint32_t *decodeArray(const uint32_t *input, const size_t length,
+  const uint32_t *decodeArray(const uint32_t *input, const size_t,
                               uint32_t *out, size_t &nvalue) {
     uint32_t markednvalue;
     if (MarkLength) {
