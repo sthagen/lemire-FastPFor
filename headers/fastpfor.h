@@ -5,8 +5,9 @@
  * (c) Daniel Lemire, http://lemire.me/en/
  */
 
-#ifndef EPFOR_H_
-#define EPFOR_H_
+#ifndef FASTPFOR_H_
+#define FASTPFOR_H_
+
 #include "blockpacking.h"
 #include "codecs.h"
 #include "common.h"
@@ -405,14 +406,13 @@ public:
     }
     assert(out == nvalue + initout);
     if (oldnvalue < nvalue)
-      std::cerr
-          << "It is possible we have a buffer overrun. You reported having allocated "
-          << oldnvalue * sizeof(uint32_t)
-          << " bytes for the compressed data but we needed "
-          << nvalue * sizeof(uint32_t)
-          << " bytes. Please increase the available memory"
-              " for compressed data or check the value of the last parameter provided "
-              " to the encodeArray method." << std::endl;
+      fprintf(stderr,
+          "It is possible we have a buffer overrun. You reported having allocated "
+          "%zu bytes for the compressed data but we needed "
+          "%zu bytes. Please increase the available memory "
+          "for compressed data or check the value of the last parameter provided "
+          "to the encodeArray method.\n",
+          oldnvalue * sizeof(uint32_t), nvalue * sizeof(uint32_t));
   }
 
   void getBestBFromData(const uint32_t *in, uint8_t &bestb,
@@ -514,4 +514,4 @@ public:
 
 }  // namespace FastPForLib
 
-#endif /* EPFOR_H_ */
+#endif /* FASTPFOR_H_ */

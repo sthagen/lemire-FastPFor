@@ -286,7 +286,7 @@ public:
     }
     const size_t actualvalue = MarkLength ? markednvalue : nvalue;
     if (nvalue < actualvalue) {
-      std::cerr << " possible overrun" << std::endl;
+      fprintf(stderr, "possible overrun\n");
     }
     auto count = actualvalue;
     Simple9_Codec::Decompress(input, 0, out, 0, count);
@@ -298,6 +298,6 @@ public:
 
 #undef _SIMPLE9_USE_RLE
 
-} // namespace FastPFor
+} // namespace FastPForLib
 
 #endif /* SIMPLE9_RLE_H_ */
