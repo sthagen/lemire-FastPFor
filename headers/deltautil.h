@@ -493,11 +493,11 @@ public:
                     << recoveredsize << std::endl;
           throw std::logic_error("arrays don't have same size: bug.");
         }
-        for (size_t i = 0; i < datas[k].size(); i++) {
-          if (datas[k][i] != recov[i]) {
-            std::cout << "difference at index " << i << ":" << std::endl;
-            std::cout << "  expected: " << datas[k][i] << std::endl;
-            std::cout << "    actual: " << recov[i] << std::endl;
+        for (size_t j = 0; j < datas[k].size(); j++) {
+          if (datas[k][j] != recov[j]) {
+            std::cout << "difference at index " << j << ":" << std::endl;
+            std::cout << "  expected: " << datas[k][j] << std::endl;
+            std::cout << "    actual: " << recov[j] << std::endl;
             throw std::logic_error("we have a bug");
           }
         }
