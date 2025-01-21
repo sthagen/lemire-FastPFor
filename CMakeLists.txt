@@ -3,9 +3,12 @@
 #
 # Copyright (c) 2012 Louis Dionne
 #
-cmake_minimum_required(VERSION 3.0)
-set (CMAKE_CXX_STANDARD 11) # for constexpr specifier and other goodies
+cmake_minimum_required(VERSION 3.5)
 
+set (CMAKE_CXX_STANDARD 11) # for constexpr specifier and other goodies
+set(CMAKE_CXX_STANDARD_REQUIRED True)
+set (CMAKE_C_STANDARD 99)
+set(CMAKE_C_STANDARD_REQUIRED True)
 if (NOT CMAKE_BUILD_TYPE)
 		message(STATUS "No build type selected, default to Release")
 		set(CMAKE_BUILD_TYPE Release CACHE STRING "Choose the type of build." FORCE)
@@ -28,26 +31,6 @@ include("${CMAKE_CURRENT_SOURCE_DIR}/cmake_modules/environment.cmake")
 
 message("Building for architecture: ${CMAKE_SYSTEM_PROCESSOR}")
 
-# Runs compiler with "-dumpversion" and parses major/minor
-# version with a regex.
-#
-# Taken&Modified from Boost.cmake
-#
-function(CXX_COMPILER_DUMPVERSION _OUTPUT_VERSION)
-
-  exec_program(${CMAKE_CXX_COMPILER}
-    ARGS ${CMAKE_CXX_COMPILER_ARG1} -dumpversion
-    OUTPUT_VARIABLE COMPILER_VERSION
-  )
-  #string(REGEX REPLACE "([0-9])\\.([0-9])(\\.[0-9])?" "\\1\\2"
-  #   COMPILER_VERSION ${COMPILER_VERSION})
-
-  set(${_OUTPUT_VERSION} ${COMPILER_VERSION} PARENT_SCOPE)
-endfunction()
-
-if(NOT WIN32)
-    CXX_COMPILER_DUMPVERSION(CXX_COMPILER_VERSION)
-endif()
 
 MESSAGE( STATUS "CMAKE_SIZEOF_VOID_P (should be 8): " ${CMAKE_SIZEOF_VOID_P} )
 if( CMAKE_SIZEOF_VOID_P EQUAL 8 )
@@ -57,7 +40,6 @@ else()
 endif()
 MESSAGE( STATUS "CMAKE_CXX_COMPILER_ID: " ${CMAKE_CXX_COMPILER_ID} )
 MESSAGE( STATUS "CMAKE_C_COMPILER: " ${CMAKE_C_COMPILER} )
-MESSAGE( STATUS "CXX_COMPILER_VERSION: " ${CXX_COMPILER_VERSION} )
 if( SUPPORT_SSE42 )
     MESSAGE( STATUS "SSE 4.2 support detected" )
 else()
@@ -69,49 +51,25 @@ else()
     endif ()
 endif()
 
-if(${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU")
-    # require at least gcc 4.7
-    if (CXX_COMPILER_VERSION VERSION_LESS 4.7)
-        message(STATUS "GCC version must be at least 4.7!")
-    endif()
-    # Uncomment the following lines to see how the code compiles without AVX,SSE4.2 and/or SSE2
-    #set (CMAKE_CXX_FLAGS_RELEASE "-Wall -Ofast -lm  -DNDEBUG -std=c++11 -DHAVE_CXX0X -march=x86-64")
-    #set (CMAKE_CXX_FLAGS_RELEASE "-Wall -Ofast -lm  -DNDEBUG -std=c++11 -DHAVE_CXX0X -march=core2")
-    #set (CMAKE_CXX_FLAGS_RELEASE "-Wall -Ofast -lm  -DNDEBUG -std=c++11 -DHAVE_CXX0X -msse4.2")
-    set (CMAKE_CXX_FLAGS_RELEASE "-Wall -Wcast-align -Ofast -lm  -DNDEBUG -std=c++11 -DHAVE_CXX0X -march=native")
-    set (CMAKE_CXX_FLAGS_DEBUG   "-Wall -Wcast-align -ggdb  -lm  -std=c++11 -DHAVE_CXX0X -march=native")
-    set (CMAKE_C_FLAGS_RELEASE "-Wall -Wcast-align -Ofast -lm  -DNDEBUG -std=c99  -march=native")
-    set (CMAKE_C_FLAGS_DEBUG   "-Wall -Wcast-align -ggdb  -lm  -std=c99  -march=native")
-elseif(${CMAKE_CXX_COMPILER_ID} STREQUAL "Intel")
-    if (CXX_COMPILER_VERSION VERSION_LESS 14.0.1)
-        message(STATUS "Intel version must be at least 14.0.1!")
-    endif()
-    set (CMAKE_CXX_FLAGS_RELEASE "-Wall -Ofast  -DNDEBUG -std=c++11 -DHAVE_CXX0X  -march=native")
-    set (CMAKE_CXX_FLAGS_DEBUG   "-Wall -ggdb   -std=c++11 -DHAVE_CXX0X  -march=native")
-    set (CMAKE_C_FLAGS_RELEASE "-Wall -Ofast  -DNDEBUG -std=c99  -march=native")
-    set (CMAKE_C_FLAGS_DEBUG   "-Wall -ggdb   -std=c99  -march=native")
-elseif(${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang" OR ${CMAKE_CXX_COMPILER_ID} STREQUAL "AppleClang")
-    if (CXX_COMPILER_VERSION VERSION_LESS 4.2.1)
-        message(STATUS  "Clang version must be at least 4.2.1!" )
-    endif()
-    set (CMAKE_CXX_FLAGS_RELEASE "-Wall -Wcast-align -O3 -DNDEBUG -std=c++11 -DHAVE_CXX0X -march=native")
-    set (CMAKE_CXX_FLAGS_DEBUG   "-Wall -Wcast-align -ggdb  -std=c++11 -DHAVE_CXX0X -march=native")
-    set (CMAKE_C_FLAGS_RELEASE "-Wall -Wcast-align -O3 -DNDEBUG -std=c99 -march=native")
-    set (CMAKE_C_FLAGS_DEBUG   "-Wall -Wcast-align -ggdb  -std=c99 -march=native")
-elseif(WIN32)
-    # TODO add support for later versions?
-    if(NOT MSVC12)
-         message(STATUS "On Windows, only MSVC version 12 is supported!")
-    endif()
-else ()
-    message(FATAL_ERROR "Please, use GCC, Clang, or the Intel compiler!")
+
+
+if(${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU" OR ${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang" OR ${CMAKE_CXX_COMPILER_ID} STREQUAL "AppleClang")
+  add_compile_options(-Wall -Wextra -Weffc++ -Wsign-compare -Wshadow -Wwrite-strings -Wpointer-arith -Winit-self -Wconversion -Wno-sign-conversion -Wunused-function)
 endif()
+include(CheckCXXCompilerFlag)
+unset(FASTPFOR_COMPILER_SUPPORTS_MARCH_NATIVE CACHE)
+CHECK_CXX_COMPILER_FLAG(-march=native FASTPFOR_COMPILER_SUPPORTS_MARCH_NATIVE)
+if(FASTPFOR_COMPILER_SUPPORTS_MARCH_NATIVE)
+    add_compile_options(-march=native)
+else()
+     message(STATUS "native target not supported")
+endif()
+
 
 MESSAGE( STATUS "CMAKE_CXX_FLAGS_DEBUG: " ${CMAKE_CXX_FLAGS_DEBUG} )
 MESSAGE( STATUS "CMAKE_CXX_FLAGS_RELEASE: " ${CMAKE_CXX_FLAGS_RELEASE} )
 MESSAGE( STATUS "CMAKE_C_FLAGS_DEBUG: " ${CMAKE_C_FLAGS_DEBUG} )
 MESSAGE( STATUS "CMAKE_C_FLAGS_RELEASE: " ${CMAKE_C_FLAGS_RELEASE} )
-
 
 
 
@@ -128,6 +86,10 @@ add_library(FastPFOR STATIC
     src/varintdecode.c
     src/streamvbyte.c)
 set_target_properties(FastPFOR PROPERTIES POSITION_INDEPENDENT_CODE TRUE)
+
+#if (NOT WIN32)
+#  target_link_libraries(FastPFOR m)
+#endif()
 
 
 # other executables

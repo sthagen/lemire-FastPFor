@@ -59,18 +59,18 @@ namespace FastPForLib {
 
         void _verify64() {
           size_t inSize = in64.size();
-          std::vector<uint32_t> encoded(in64.size() * 4);
-          size_t encodeSize = encoded.size();
+          std::vector<uint32_t> tencoded(in64.size() * 4);
+          size_t encodeSize = tencoded.size();
 
           codec->encodeArray(
                              reinterpret_cast<uint64_t *>(in64.data()),
                              inSize,
-                             encoded.data(),
+                             tencoded.data(),
                              encodeSize);
 
           out64.resize(inSize);
           codec->decodeArray(
-                             encoded.data(),
+                             tencoded.data(),
                              encodeSize,
                              reinterpret_cast<uint64_t *>(out64.data()),
                              inSize);

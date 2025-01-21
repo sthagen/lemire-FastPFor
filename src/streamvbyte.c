@@ -261,7 +261,7 @@ uint8_t *svb_insert_scalar_d1_init(uint8_t *keyPtr, uint8_t *dataPtr,
 
       // first insert the new key
       uint8_t code = _encode_data(new_key - prev, &dataPtr);
-      *keyPtr = key | (code << shift);
+      *keyPtr = (uint8_t)(key | (code << shift));
 
       // then update the current key
       shift += 2;
@@ -290,7 +290,7 @@ uint8_t *svb_insert_scalar_d1_init(uint8_t *keyPtr, uint8_t *dataPtr,
   uint8_t code = _encode_data(new_key - prev, &dataPtr);
   key &= ~(3 << shift);
   key |= code << shift;
-  *keyPtr = key; // write last key (no increment needed)
+  *keyPtr = (uint8_t)(key); // write last key (no increment needed)
 
   *position = count;
   return dataPtrBegin + dataSize + code + 1;
