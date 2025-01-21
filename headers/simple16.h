@@ -487,7 +487,7 @@ void Simple16<MarkLength>::encodeArray(const uint32_t *in, const size_t length,
       NumberOfValuesCoded += base;
     } else if (tryme<1, 3, 4, 4, 3, 3>(in, ValuesRemaining)) {
       out[0] = 6;
-      NumberOfValuesCoded = (ValuesRemaining < 1) ? ValuesRemaining : 1;
+      NumberOfValuesCoded = (ValuesRemaining < 1) ? uint32_t(ValuesRemaining) : 1;
       for (uint32_t i = 0; i < NumberOfValuesCoded; i++)
         bit_writer(out, *in++, 3);
       uint32_t fill = 3 * NumberOfValuesCoded;
@@ -593,7 +593,7 @@ void Simple16<MarkLength>::encodeArray(const uint32_t *in, const size_t length,
         assert(which(out) == 12);
     } else if (tryme<1, 10, 2, 9>(in, ValuesRemaining)) {
       out[0] = 13;
-      NumberOfValuesCoded = (ValuesRemaining < 1) ? ValuesRemaining : 1;
+      NumberOfValuesCoded = (ValuesRemaining < 1) ? uint32_t(ValuesRemaining) : 1;
       for (uint32_t i = 0; i < NumberOfValuesCoded; i++)
         bit_writer(out, *in++, 10);
       const uint32_t base = NumberOfValuesCoded;
