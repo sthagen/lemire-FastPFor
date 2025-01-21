@@ -44,7 +44,7 @@ if( SUPPORT_SSE42 )
     MESSAGE( STATUS "SSE 4.2 support detected" )
 else()
     if (SUPPORT_NEON)
-        include("${CMAKE_MODULE_PATH}/simde.cmake")
+        include(simde)
         MESSAGE(STATUS "USING SIMDE FOR SIMD OPERATIONS")
     else ()
         MESSAGE(STATUS "SIMDE and SSE 4.2 support not detected")
@@ -65,6 +65,10 @@ else()
      message(STATUS "native target not supported")
 endif()
 
+
+# set RelWithDebInfo flags as release
+set (CMAKE_CXX_FLAGS_RELWITHDEBINFO ${CMAKE_CXX_FLAGS_RELEASE})
+set (CMAKE_C_FLAGS_RELWITHDEBINFO ${CMAKE_C_FLAGS_RELEASE})
 
 MESSAGE( STATUS "CMAKE_CXX_FLAGS_DEBUG: " ${CMAKE_CXX_FLAGS_DEBUG} )
 MESSAGE( STATUS "CMAKE_CXX_FLAGS_RELEASE: " ${CMAKE_CXX_FLAGS_RELEASE} )
