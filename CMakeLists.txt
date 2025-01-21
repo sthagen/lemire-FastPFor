@@ -54,7 +54,7 @@ endif()
 
 
 if(${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU" OR ${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang" OR ${CMAKE_CXX_COMPILER_ID} STREQUAL "AppleClang")
-  add_compile_options(-Wall -Wextra -Weffc++ -Wsign-compare -Wshadow -Wwrite-strings -Wpointer-arith -Winit-self -Wconversion -Wno-sign-conversion -Wunused-function)
+  add_compile_options(-Wall -Wextra)
 endif()
 include(CheckCXXCompilerFlag)
 unset(FASTPFOR_COMPILER_SUPPORTS_MARCH_NATIVE CACHE)
