@@ -175,7 +175,7 @@ namespace FastPForLib {
             __m128i comprBlock = _mm_load_si128(in++);
             for (size_t k = 1; k < n; k++)
               comprBlock = _mm_or_si128(comprBlock,
-                                        mm_slli_epi32_unrolled(_mm_load_si128(in++), k * b));
+                                        mm_slli_epi32_unrolled(_mm_load_si128(in++), (unsigned int)(k * b)));
             _mm_store_si128(out++, comprBlock);
           }
 
@@ -651,7 +651,7 @@ namespace FastPForLib {
     const __m128i comprBlock = _mm_load_si128(in++);
     for (size_t k = 0; k < n; k++)
       _mm_store_si128(out++,
-                      _mm_and_si128(mm_srli_epi32_unrolled(comprBlock, k * b), mask));
+                      _mm_and_si128(mm_srli_epi32_unrolled(comprBlock, (unsigned int)(k * b)), mask));
   }
 
   inline static __m128i mm_srli_epi32_unrolled(__m128i comprBlock, unsigned int n) {
@@ -1170,7 +1170,7 @@ namespace FastPForLib {
             // The number of bytes actually used for the selectors area.
             const size_t countSelArea8Used = outSelArea8 - initOutSelArea8;
             // The total number of selectors.
-            const int countSels = countSelArea8Used * 2 - (even ? 0 : 1);
+            const int countSels = int(countSelArea8Used * 2 - (even ? 0 : 1));
 
             // The number of bytes that could be required for the selectors area in the
             // worst case.
@@ -1202,15 +1202,15 @@ namespace FastPForLib {
             for (int m = 0; m < countSels - 1; m++) {
                 const uint8_t i = extractSel(initOutSelArea8, m);
                 const size_t n = tableNum[i];
-                comprCompleteBlock(n, in128, outDataArea128);
+                comprCompleteBlock(uint8_t(n), in128, outDataArea128);
             }
             if (countQuadsLastBlock)
                 comprIncompleteBlock(countQuadsLastBlock, in128, outDataArea128);
 
             // Write some meta data to the header.
-            outHeader32[0] = len;
-            outHeader32[1] = countSels;
-            outHeader32[2] = countSelArea8;
+            outHeader32[0] = uint32_t(len);
+            outHeader32[1] = uint32_t(countSels);
+            outHeader32[2] = uint32_t(countSelArea8);
 
             // The position of the last byte written to the output relative to the
             // start of the output. Note that the actual number of written bytes might
@@ -1220,7 +1220,7 @@ namespace FastPForLib {
                                   countSelArea8 + sizeof(uint8_t) + countPadBytes +
                                   (outDataArea128 - initOutDataArea128) * sizeof(__m128i);
             // Rounding the number of bytes to full 32-bit integers.
-            nvalue = div_roundup(nbytes, sizeof(uint32_t));
+            nvalue = div_roundup(uint32_t(nbytes), sizeof(uint32_t));
         }
 
         /**
@@ -1319,7 +1319,7 @@ namespace FastPForLib {
                     // not seem to yield any benefit.
                 } else
                     // This can only happen for the last block/selector
-                    comprIncompleteBlock(rbSize, in128, outDataArea128_wGap);
+                    comprIncompleteBlock(uint8_t(rbSize), in128, outDataArea128_wGap);
             }
             if (!even)
                 // The last used byte in the selectors area was touched, but not finished.
@@ -1359,9 +1359,9 @@ namespace FastPForLib {
             }
 
             // Write some meta data to the header.
-            outHeader32[0] = len;
-            outHeader32[1] = countSels;
-            outHeader32[2] = countSelArea8;
+            outHeader32[0] = uint32_t(len);
+            outHeader32[1] = uint32_t(countSels);
+            outHeader32[2] = uint32_t(countSelArea8);
 
             // The position of the last byte written to the output relative to the
             // start of the output. Note that the actual number of written bytes might
@@ -1371,7 +1371,7 @@ namespace FastPForLib {
                                   countSelArea8 + sizeof(uint8_t) + actualPaddingBytes +
                                   countDataArea128 * sizeof(__m128i);
             // Rounding the number of bytes to full 32-bit integers.
-            nvalue = div_roundup(nbytes, sizeof(uint32_t));
+            nvalue = div_roundup(uint32_t(nbytes), sizeof(uint32_t));
         }
 
         void encodeArray(const uint32_t *in, const size_t len, uint32_t *out,
@@ -1415,7 +1415,7 @@ namespace FastPForLib {
             for (int m = 0; m < countSels - 1; m++) {
                 const uint8_t i = extractSel(inSelArea8, m);
                 const size_t n = tableNum[i];
-                decomprCompleteBlock(n, inDataArea128, out128);
+                decomprCompleteBlock(uint8_t(n), inDataArea128, out128);
             }
             const uint8_t countQuadsLastBlock = inSelArea8[countSelArea8Used];
             if (countQuadsLastBlock)

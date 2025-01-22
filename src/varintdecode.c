@@ -1210,7 +1210,7 @@ size_t masked_vbyte_read_loop(const uint8_t *in, uint32_t *out,
     } while (count + 112 < length); // 112 == 48 + 48 ahead for scanning + up to
                                     // 16 remaining in sig
     sig = (nextSig << (scanned - consumed - 48)) | sig;
-    availablebytes = scanned - consumed;
+    availablebytes = (int)(scanned - consumed);
   }
   while (availablebytes + count < length) {
     if (availablebytes < 16) {
@@ -1328,7 +1328,7 @@ size_t altmasked_vbyte_read_loop(const uint8_t *in, uint32_t *out,
       }
     }
     sig = (nextSig << (scanned - consumed - 48)) | sig;
-    availablebytes = scanned - consumed;
+    availablebytes = (int)(scanned - consumed);
   }
   while (1) {
     if (availablebytes < 16) {
@@ -1447,7 +1447,7 @@ size_t masked_vbyte_read_loop_fromcompressedsize(const uint8_t *in,
       }
     }
     sig = (nextSig << (scanned - consumed - 48)) | sig;
-    availablebytes = scanned - consumed;
+    availablebytes = (int)(scanned - consumed);
   }
   while (1) {
     if (availablebytes < 16) {
@@ -1575,7 +1575,7 @@ size_t altmasked_vbyte_read_loop_fromcompressedsize(const uint8_t *in,
       }
     }
     sig = (nextSig << (scanned - consumed - 48)) | sig;
-    availablebytes = scanned - consumed;
+    availablebytes = (int)(scanned - consumed);
   }
   while (1) {
     if (availablebytes < 16) {
