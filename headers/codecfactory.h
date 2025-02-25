@@ -25,7 +25,7 @@ public:
 
   std::vector<std::string> allNames();
 
-  std::shared_ptr<IntegerCODEC> &getFromName(std::string name);
+  std::shared_ptr<IntegerCODEC> const& getFromName(std::string name) const;
 private:
   CodecMap scodecmap;
 };
