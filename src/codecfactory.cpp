@@ -29,7 +29,7 @@
 #include "simdgroupsimple.h"
 
 namespace FastPForLib {
-std::vector<std::shared_ptr<IntegerCODEC>> CODECFactory::allSchemes() {
+std::vector<std::shared_ptr<IntegerCODEC>> CODECFactory::allSchemes() const {
   std::vector<std::shared_ptr<IntegerCODEC>> ans;
   for (auto i = scodecmap.begin(); i != scodecmap.end(); ++i) {
     ans.push_back(i->second);
@@ -37,7 +37,7 @@ std::vector<std::shared_ptr<IntegerCODEC>> CODECFactory::allSchemes() {
   return ans;
 }
 
-std::vector<std::string> CODECFactory::allNames() {
+std::vector<std::string> CODECFactory::allNames() const {
   std::vector<std::string> ans;
   for (auto i = scodecmap.begin(); i != scodecmap.end(); ++i) {
     ans.push_back(i->first);
