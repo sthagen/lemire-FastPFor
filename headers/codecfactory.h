@@ -21,11 +21,11 @@ class CODECFactory {
 public:
   CODECFactory();
 
-  std::vector<std::shared_ptr<IntegerCODEC>> allSchemes();
+  std::vector<std::shared_ptr<IntegerCODEC>> allSchemes() const;
 
-  std::vector<std::string> allNames();
+  std::vector<std::string> allNames() const;
 
-  std::shared_ptr<IntegerCODEC> &getFromName(std::string name);
+  std::shared_ptr<IntegerCODEC> const& getFromName(std::string name) const;
 private:
   CodecMap scodecmap;
 };

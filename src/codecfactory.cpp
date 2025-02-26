@@ -29,7 +29,7 @@
 #include "simdgroupsimple.h"
 
 namespace FastPForLib {
-std::vector<std::shared_ptr<IntegerCODEC>> CODECFactory::allSchemes() {
+std::vector<std::shared_ptr<IntegerCODEC>> CODECFactory::allSchemes() const {
   std::vector<std::shared_ptr<IntegerCODEC>> ans;
   for (auto i = scodecmap.begin(); i != scodecmap.end(); ++i) {
     ans.push_back(i->second);
@@ -37,7 +37,7 @@ std::vector<std::shared_ptr<IntegerCODEC>> CODECFactory::allSchemes() {
   return ans;
 }
 
-std::vector<std::string> CODECFactory::allNames() {
+std::vector<std::string> CODECFactory::allNames() const {
   std::vector<std::string> ans;
   for (auto i = scodecmap.begin(); i != scodecmap.end(); ++i) {
     ans.push_back(i->first);
@@ -45,7 +45,7 @@ std::vector<std::string> CODECFactory::allNames() {
   return ans;
 }
 
-std::shared_ptr<IntegerCODEC> &CODECFactory::getFromName(std::string name) {
+std::shared_ptr<IntegerCODEC> const& CODECFactory::getFromName(std::string name) const {
   if (scodecmap.find(name) == scodecmap.end()) {
     fprintf(stderr, "name %s does not refer to a CODEC.\n"
                     "possible choices:\n", name.c_str());
@@ -53,9 +53,9 @@ std::shared_ptr<IntegerCODEC> &CODECFactory::getFromName(std::string name) {
       fprintf(stderr, "%s\n", i->first.c_str());
     }
     fprintf(stderr, "for now, I'm going to just return 'copy'\n");
-    return scodecmap["copy"];
+    return scodecmap.at("copy");
   }
-  return scodecmap[name];
+  return scodecmap.at(name);
 }
 
 std::shared_ptr<IntegerCODEC> fastbinarypacking8_codec() {

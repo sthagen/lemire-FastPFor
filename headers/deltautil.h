@@ -25,7 +25,7 @@ namespace FastPForLib {
  */
 struct algostats {
 
-  algostats(std::shared_ptr<IntegerCODEC> &a, bool simd = false)
+  algostats(const std::shared_ptr<IntegerCODEC> &a, bool simd = false)
       : algo(a), deltaspeed(), compspeed(), decompspeed(), inversedeltaspeed(),
         bitsperint(), deltatime(0), comptime(0), decomptime(0),
         inversedeltatime(0), output(), input(), SIMDDeltas(simd) {}
