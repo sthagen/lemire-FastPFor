@@ -884,7 +884,7 @@ uint8_t *svb_decode_avx_simple(uint32_t *out, uint8_t *__restrict__ keyPtr,
   return svb_decode_scalar(out, keyPtr + consumedkeys, dataPtr, count & 31);
 }
 
-uint64_t svb_encode(uint8_t *out, const uint32_t *in, uint32_t count, int delta,
+size_t svb_encode(uint8_t *out, const uint32_t *in, uint32_t count, int delta,
                     int type) {
   *(uint32_t *)out = count;          // first 4 bytes is number of ints
   uint8_t *keyPtr = out + 4;         // keys come immediately after 32-bit count
@@ -903,7 +903,7 @@ uint64_t svb_encode(uint8_t *out, const uint32_t *in, uint32_t count, int delta,
   abort();
 }
 
-uint64_t svb_decode(uint32_t *out, uint8_t *in, int delta, int type) {
+size_t svb_decode(uint32_t *out, uint8_t *in, int delta, int type) {
   uint32_t count = *(uint32_t *)in; // first 4 bytes is number of ints
   if (count == 0)
     return 0;
