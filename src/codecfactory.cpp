@@ -167,44 +167,44 @@ std::unique_ptr<IntegerCODEC> copy_codec() {
 
 static CodecMap initializefactory() {
   CodecMap map;
-  map["fastbinarypacking8"] = std::move(fastbinarypacking8_codec());
-  map["fastbinarypacking16"] = std::move(fastbinarypacking16_codec());
-  map["fastbinarypacking32"] = std::move(fastbinarypacking32_codec());
-  map["BP32"] = std::move(BP32_codec());
-  map["vsencoding"] = std::move(vsencoding_codec());
-  map["fastpfor128"] = std::move(fastpfor128_codec());
-  map["fastpfor256"] = std::move(fastpfor256_codec());
-  map["simdfastpfor128"] = std::move(simdfastpfor128_codec());
-  map["simdfastpfor256"] = std::move(simdfastpfor256_codec());
-  map["simplepfor"] = std::move(simplepfor_codec());
-  map["simdsimplepfor"] = std::move(simdsimplepfor_codec());
-  map["pfor"] = std::move(pfor_codec());
-  map["simdpfor"] = std::move(simdpfor_codec());
-  map["pfor2008"] = std::move(pfor2008_codec());
-  map["simdnewpfor"] = std::move(simdnewpfor_codec());
-  map["newpfor"] = std::move(newpfor_codec());
-  map["optpfor"] = std::move(optpfor_codec());
-  map["simdoptpfor"] = std::move(simdoptpfor_codec());
-  map["varint"] = std::move(varint_codec());
-  map["vbyte"] = std::move(vbyte_codec());
-  map["maskedvbyte"] = std::move(maskedvbyte_codec());
-  map["streamvbyte"] = std::move(streamvbyte_codec());
-  map["varintgb"] = std::move(varintgb_codec());
-  map["simple16"] = std::move(simple16_codec());
-  map["simple9"] = std::move(simple9_codec());
-  map["simple9_rle"] = std::move(simple9_rle_codec());
-  map["simple8b"] = std::move(simple8b_codec());
-  map["simple8b_rle"] = std::move(simple8b_rle_codec());
+  map["fastbinarypacking8"] = fastbinarypacking8_codec();
+  map["fastbinarypacking16"] = fastbinarypacking16_codec();
+  map["fastbinarypacking32"] = fastbinarypacking32_codec();
+  map["BP32"] = BP32_codec();
+  map["vsencoding"] = vsencoding_codec();
+  map["fastpfor128"] = fastpfor128_codec();
+  map["fastpfor256"] = fastpfor256_codec();
+  map["simdfastpfor128"] = simdfastpfor128_codec();
+  map["simdfastpfor256"] = simdfastpfor256_codec();
+  map["simplepfor"] = simplepfor_codec();
+  map["simdsimplepfor"] = simdsimplepfor_codec();
+  map["pfor"] = pfor_codec();
+  map["simdpfor"] = simdpfor_codec();
+  map["pfor2008"] = pfor2008_codec();
+  map["simdnewpfor"] = simdnewpfor_codec();
+  map["newpfor"] = newpfor_codec();
+  map["optpfor"] = optpfor_codec();
+  map["simdoptpfor"] = simdoptpfor_codec();
+  map["varint"] = varint_codec();
+  map["vbyte"] = vbyte_codec();
+  map["maskedvbyte"] = maskedvbyte_codec();
+  map["streamvbyte"] = streamvbyte_codec();
+  map["varintgb"] = varintgb_codec();
+  map["simple16"] = simple16_codec();
+  map["simple9"] = simple9_codec();
+  map["simple9_rle"] = simple9_rle_codec();
+  map["simple8b"] = simple8b_codec();
+  map["simple8b_rle"] = simple8b_rle_codec();
 #ifdef VARINTG8IU_H__
-  map["varintg8iu"] = std::move(varintg8iu_codec());
+  map["varintg8iu"] = varintg8iu_codec();
 #endif
 #ifdef USESNAPPY
-  map["snappy"] = std::move(snappy_codec());
+  map["snappy"] = snappy_codec();
 #endif
-  map["simdbinarypacking"] = std::move(simdbinarypacking_codec());
-  map["simdgroupsimple"] = std::move(simdgroupsimple_codec());
-  map["simdgroupsimple_ringbuf"] = std::move(simdgroupsimple_ringbuf_codec());
-  map["copy"] = std::move(copy_codec());
+  map["simdbinarypacking"] = simdbinarypacking_codec();
+  map["simdgroupsimple"] = simdgroupsimple_codec();
+  map["simdgroupsimple_ringbuf"] = simdgroupsimple_ringbuf_codec();
+  map["copy"] = copy_codec();
   return map;
 }
 
