@@ -292,7 +292,7 @@ Simple9<MarkLength, hacked>::decodeArray(const uint32_t *in, const size_t /* len
   if (MarkLength)
     if ((*in) > nvalue)
       throw NotEnoughStorage(*in);
-  const uint32_t actualvalue = MarkLength ? *(in++) : nvalue;
+  const uint32_t actualvalue = MarkLength ? *(in++) : (uint32_t)nvalue;
   if (nvalue < actualvalue)
     fprintf(stderr, "possible overrun\n");
   nvalue = actualvalue;

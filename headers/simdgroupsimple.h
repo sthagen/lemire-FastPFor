@@ -162,7 +162,7 @@ namespace FastPForLib {
             __m128i comprBlock = _mm_loadu_si128(in++);
             for (size_t k = 1; k < n; k++)
                 comprBlock = _mm_or_si128(comprBlock,
-                                          _mm_slli_epi32(_mm_loadu_si128(in++), k * b));
+                                          _mm_slli_epi32(_mm_loadu_si128(in++), (int)(k * b)));
             _mm_storeu_si128(out++, comprBlock);
         }
 
@@ -638,7 +638,7 @@ namespace FastPForLib {
             const __m128i comprBlock = _mm_loadu_si128(in++);
             for (size_t k = 0; k < n; k++)
                 _mm_storeu_si128(out++,
-                                 _mm_and_si128(_mm_srli_epi32(comprBlock, k * b), mask));
+                                 _mm_and_si128(_mm_srli_epi32(comprBlock, (int)(k * b)), mask));
         }
 
 #elif (defined(__GNUC__) && (defined(__aarch64__))) || (defined(_MSC_VER) && defined(_M_ARM64))
