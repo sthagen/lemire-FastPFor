@@ -46,16 +46,17 @@ std::vector<std::string> CODECFactory::allNames() const {
 }
 
 std::shared_ptr<IntegerCODEC> const& CODECFactory::getFromName(std::string name) const {
-  if (scodecmap.find(name) == scodecmap.end()) {
-    fprintf(stderr, "name %s does not refer to a CODEC.\n"
-                    "possible choices:\n", name.c_str());
-    for (auto i = scodecmap.begin(); i != scodecmap.end(); ++i) {
-      fprintf(stderr, "%s\n", i->first.c_str());
-    }
-    fprintf(stderr, "for now, I'm going to just return 'copy'\n");
-    return scodecmap.at("copy");
+  auto it = scodecmap.find(name);
+  if (it != scodecmap.end())
+    return it->second;
+
+  fprintf(stderr, "name %s does not refer to a CODEC.\n"
+                  "possible choices:\n", name.c_str());
+  for (auto i = scodecmap.begin(); i != scodecmap.end(); ++i) {
+    fprintf(stderr, "%s\n", i->first.c_str());
   }
-  return scodecmap.at(name);
+  fprintf(stderr, "for now, I'm going to just return 'copy'\n");
+  return scodecmap.at("copy");
 }
 
 std::unique_ptr<IntegerCODEC> fastbinarypacking8_codec() {
