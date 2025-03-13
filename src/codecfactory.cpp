@@ -59,111 +59,117 @@ std::shared_ptr<IntegerCODEC> const& CODECFactory::getFromName(std::string name)
   return scodecmap.at("copy");
 }
 
+// std::make_unique equivalent
+template<typename T, typename... Args>
+static std::unique_ptr<T> make_unique(Args&&... args) {
+  return std::unique_ptr<T>(new T(std::forward<Args>(args)...));
+}
+
 std::unique_ptr<IntegerCODEC> fastbinarypacking8_codec() {
-  return std::unique_ptr<IntegerCODEC>(new CompositeCodec<FastBinaryPacking<8>, VariableByte>());
+  return make_unique<CompositeCodec<FastBinaryPacking<8>, VariableByte>>();
 }
 std::unique_ptr<IntegerCODEC> fastbinarypacking16_codec() {
-  return std::unique_ptr<IntegerCODEC>(new CompositeCodec<FastBinaryPacking<16>, VariableByte>());
+  return make_unique<CompositeCodec<FastBinaryPacking<16>, VariableByte>>();
 }
 std::unique_ptr<IntegerCODEC> fastbinarypacking32_codec() {
-  return std::unique_ptr<IntegerCODEC>(new CompositeCodec<FastBinaryPacking<32>, VariableByte>());
+  return make_unique<CompositeCodec<FastBinaryPacking<32>, VariableByte>>();
 }
 std::unique_ptr<IntegerCODEC> BP32_codec() {
-  return std::unique_ptr<IntegerCODEC>(new CompositeCodec<BP32, VariableByte>());
+  return make_unique<CompositeCodec<BP32, VariableByte>>();
 }
 std::unique_ptr<IntegerCODEC> vsencoding_codec() {
-  return std::unique_ptr<IntegerCODEC>(new vsencoding::VSEncodingBlocks(1U << 16));
+  return make_unique<vsencoding::VSEncodingBlocks>(1U << 16);
 }
 std::unique_ptr<IntegerCODEC> fastpfor128_codec() {
-  return std::unique_ptr<IntegerCODEC>(new CompositeCodec<FastPFor<4>, VariableByte>());
+  return make_unique<CompositeCodec<FastPFor<4>, VariableByte>>();
 }
 std::unique_ptr<IntegerCODEC> fastpfor256_codec() {
-  return std::unique_ptr<IntegerCODEC>(new CompositeCodec<FastPFor<8>, VariableByte>());
+  return make_unique<CompositeCodec<FastPFor<8>, VariableByte>>();
 }
 std::unique_ptr<IntegerCODEC> simdfastpfor128_codec() {
-  return std::unique_ptr<IntegerCODEC>(new CompositeCodec<SIMDFastPFor<4>, VariableByte>());
+  return make_unique<CompositeCodec<SIMDFastPFor<4>, VariableByte>>();
 }
 std::unique_ptr<IntegerCODEC> simdfastpfor256_codec() {
-  return std::unique_ptr<IntegerCODEC>(new CompositeCodec<SIMDFastPFor<8>, VariableByte>());
+  return make_unique<CompositeCodec<SIMDFastPFor<8>, VariableByte>>();
 }
 std::unique_ptr<IntegerCODEC> simplepfor_codec() {
-  return std::unique_ptr<IntegerCODEC>(new CompositeCodec<SimplePFor<>, VariableByte>());
+  return make_unique<CompositeCodec<SimplePFor<>, VariableByte>>();
 }
 std::unique_ptr<IntegerCODEC> simdsimplepfor_codec() {
-  return std::unique_ptr<IntegerCODEC>(new CompositeCodec<SIMDSimplePFor<>, VariableByte>());
+  return make_unique<CompositeCodec<SIMDSimplePFor<>, VariableByte>>();
 }
 std::unique_ptr<IntegerCODEC> pfor_codec() {
-  return std::unique_ptr<IntegerCODEC>(new CompositeCodec<PFor, VariableByte>());
+  return make_unique<CompositeCodec<PFor, VariableByte>>();
 }
 std::unique_ptr<IntegerCODEC> simdpfor_codec() {
-  return std::unique_ptr<IntegerCODEC>(new CompositeCodec<SIMDPFor, VariableByte>());
+  return make_unique<CompositeCodec<SIMDPFor, VariableByte>>();
 }
 std::unique_ptr<IntegerCODEC> pfor2008_codec() {
-  return std::unique_ptr<IntegerCODEC>(new CompositeCodec<PFor2008, VariableByte>());
+  return make_unique<CompositeCodec<PFor2008, VariableByte>>();
 }
 std::unique_ptr<IntegerCODEC> simdnewpfor_codec() {
-  return std::unique_ptr<IntegerCODEC>(new CompositeCodec<SIMDNewPFor<4, Simple16<false>>, VariableByte>());
+  return make_unique<CompositeCodec<SIMDNewPFor<4, Simple16<false>>, VariableByte>>();
 }
 std::unique_ptr<IntegerCODEC> newpfor_codec() {
-  return std::unique_ptr<IntegerCODEC>(new CompositeCodec<NewPFor<4, Simple16<false>>, VariableByte>());
+  return make_unique<CompositeCodec<NewPFor<4, Simple16<false>>, VariableByte>>();
 }
 std::unique_ptr<IntegerCODEC> optpfor_codec() {
-  return std::unique_ptr<IntegerCODEC>(new CompositeCodec<OPTPFor<4, Simple16<false>>, VariableByte>());
+  return make_unique<CompositeCodec<OPTPFor<4, Simple16<false>>, VariableByte>>();
 }
 std::unique_ptr<IntegerCODEC> simdoptpfor_codec() {
-  return std::unique_ptr<IntegerCODEC>(new CompositeCodec<SIMDOPTPFor<4, Simple16<false>>, VariableByte>());
+  return make_unique<CompositeCodec<SIMDOPTPFor<4, Simple16<false>>, VariableByte>>();
 }
 std::unique_ptr<IntegerCODEC> varint_codec() {
-  return std::unique_ptr<IntegerCODEC>(new VariableByte());
+  return make_unique<VariableByte>();
 }
 std::unique_ptr<IntegerCODEC> vbyte_codec() {
-  return std::unique_ptr<IntegerCODEC>(new VByte());
+  return make_unique<VByte>();
 }
 std::unique_ptr<IntegerCODEC> maskedvbyte_codec() {
-  return std::unique_ptr<IntegerCODEC>(new MaskedVByte());
+  return make_unique<MaskedVByte>();
 }
 std::unique_ptr<IntegerCODEC> streamvbyte_codec() {
-  return std::unique_ptr<IntegerCODEC>(new StreamVByte());
+  return make_unique<StreamVByte>();
 }
 std::unique_ptr<IntegerCODEC> varintgb_codec() {
-  return std::unique_ptr<IntegerCODEC>(new VarIntGB<>());
+  return make_unique<VarIntGB<>>();
 }
 std::unique_ptr<IntegerCODEC> simple16_codec() {
-  return std::unique_ptr<IntegerCODEC>(new Simple16<true>());
+  return make_unique<Simple16<true>>();
 }
 std::unique_ptr<IntegerCODEC> simple9_codec() {
-  return std::unique_ptr<IntegerCODEC>(new Simple9<true>());
+  return make_unique<Simple9<true>>();
 }
 std::unique_ptr<IntegerCODEC> simple9_rle_codec() {
-  return std::unique_ptr<IntegerCODEC>(new Simple9_RLE<true>());
+  return make_unique<Simple9_RLE<true>>();
 }
 std::unique_ptr<IntegerCODEC> simple8b_codec() {
-  return std::unique_ptr<IntegerCODEC>(new Simple8b<true>());
+  return make_unique<Simple8b<true>>();
 }
 std::unique_ptr<IntegerCODEC> simple8b_rle_codec() {
-  return std::unique_ptr<IntegerCODEC>(new Simple8b_RLE<true>());
+  return make_unique<Simple8b_RLE<true>>();
 }
 #ifdef VARINTG8IU_H__
 std::unique_ptr<IntegerCODEC> varintg8iu_codec() {
-  return std::unique_ptr<IntegerCODEC>(new VarIntG8IU());
+  return make_unique<VarIntG8IU>();
 }
 #endif
 #ifdef USESNAPPY
 std::unique_ptr<IntegerCODEC> snappy_codec() {
-  return std::unique_ptr<IntegerCODEC>(new JustSnappy());
+  return make_unique<JustSnappy>();
 }
 #endif
 std::unique_ptr<IntegerCODEC> simdbinarypacking_codec() {
-  return std::unique_ptr<IntegerCODEC>(new CompositeCodec<SIMDBinaryPacking, VariableByte>());
+  return make_unique<CompositeCodec<SIMDBinaryPacking, VariableByte>>();
 }
 std::unique_ptr<IntegerCODEC> simdgroupsimple_codec() {
-  return std::unique_ptr<IntegerCODEC>(new CompositeCodec<SIMDGroupSimple<false, false>, VariableByte>());
+  return make_unique<CompositeCodec<SIMDGroupSimple<false, false>, VariableByte>>();
 }
 std::unique_ptr<IntegerCODEC> simdgroupsimple_ringbuf_codec() {
-  return std::unique_ptr<IntegerCODEC>(new CompositeCodec<SIMDGroupSimple<true, true>, VariableByte>());
+  return make_unique<CompositeCodec<SIMDGroupSimple<true, true>, VariableByte>>();
 }
 std::unique_ptr<IntegerCODEC> copy_codec() {
-  return std::unique_ptr<IntegerCODEC>(new JustCopy());
+  return make_unique<JustCopy>();
 }
 
 static CodecMap initializefactory() {
