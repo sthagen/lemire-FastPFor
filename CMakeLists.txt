@@ -18,6 +18,7 @@ MESSAGE( STATUS "CMAKE_BUILD_TYPE: " ${CMAKE_BUILD_TYPE} )
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake_modules")
 include(AppendCompilerFlags)
 
+include(cmake/CPM.cmake)
 
 project(FastPFOR CXX C)
 set(PROJECT_URL "https://github.com/fast-pack/FastPFOR")
@@ -52,9 +53,26 @@ else()
 endif()
 
 
-
+# library target
+add_library(FastPFOR STATIC)
+target_include_directories(FastPFOR PUBLIC 
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/headers>
+    $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/fastpfor>
+)
+target_sources(FastPFOR PRIVATE
+    src/bitpacking.cpp
+    src/bitpackingaligned.cpp
+    src/bitpackingunaligned.cpp
+    src/horizontalbitpacking.cpp
+    src/simdunalignedbitpacking.cpp
+    src/codecfactory.cpp
+    src/simdbitpacking.cpp
+    src/varintdecode.c
+    src/streamvbyte.c
+)
+set_target_properties(FastPFOR PROPERTIES POSITION_INDEPENDENT_CODE TRUE)
 if(${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU" OR ${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang" OR ${CMAKE_CXX_COMPILER_ID} STREQUAL "AppleClang")
-  add_compile_options(-Wall -Wextra)
+  target_compile_options(FastPFOR PRIVATE -Wall -Wextra)
 endif()
 include(CheckCXXCompilerFlag)
 unset(FASTPFOR_COMPILER_SUPPORTS_MARCH_NATIVE CACHE)
@@ -71,30 +89,15 @@ MESSAGE( STATUS "CMAKE_C_FLAGS_DEBUG: " ${CMAKE_C_FLAGS_DEBUG} )
 MESSAGE( STATUS "CMAKE_C_FLAGS_RELEASE: " ${CMAKE_C_FLAGS_RELEASE} )
 
 
-
-# library target
-include_directories(headers)
-add_library(FastPFOR STATIC
-    src/bitpacking.cpp
-    src/bitpackingaligned.cpp
-    src/bitpackingunaligned.cpp
-    src/horizontalbitpacking.cpp
-    src/simdunalignedbitpacking.cpp
-    src/codecfactory.cpp
-    src/simdbitpacking.cpp
-    src/varintdecode.c
-    src/streamvbyte.c)
-set_target_properties(FastPFOR PROPERTIES POSITION_INDEPENDENT_CODE TRUE)
-
-#if (NOT WIN32)
-#  target_link_libraries(FastPFOR m)
-#endif()
-
-
 # other executables
 add_executable(gapstats src/gapstats.cpp)
+target_link_libraries(gapstats PRIVATE FastPFOR)
+
 add_executable(partitionbylength src/partitionbylength.cpp)
+target_link_libraries(partitionbylength PRIVATE FastPFOR)
+
 add_executable(csv2maropu src/csv2maropu.cpp)
+target_link_libraries(csv2maropu PRIVATE FastPFOR)
 
 if (SUPPORT_NEON)
     target_link_libraries(FastPFOR PUBLIC simde)
@@ -131,39 +134,13 @@ endif()
 option(WITH_TEST "Build with Google Test" ON)
 
 if(WITH_TEST)
-  # Download and unpack googletest at configure time
-  configure_file(CMakeLists.txt.in googletest-download/CMakeLists.txt)
-  execute_process(COMMAND ${CMAKE_COMMAND} -G "${CMAKE_GENERATOR}" .
-    RESULT_VARIABLE result
-    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/googletest-download )
-  if(result)
-    message(FATAL_ERROR "CMake step for googletest failed: ${result}")
-  endif()
-  execute_process(COMMAND ${CMAKE_COMMAND} --build .
-    RESULT_VARIABLE result
-    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/googletest-download )
-  if(result)
-    message(FATAL_ERROR "Build step for googletest failed: ${result}")
-  endif()
-
-  # Prevent GoogleTest from overriding our compiler/linker options
-  # when building with Visual Studio
-  set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
-
-  # Add googletest directly to our build. This adds
-  # the following targets: gtest, gtest_main, gmock
-  # and gmock_main
-  add_subdirectory(${CMAKE_CURRENT_BINARY_DIR}/googletest-src
-                   ${CMAKE_CURRENT_BINARY_DIR}/googletest-build
-                   EXCLUDE_FROM_ALL)
-
-  # The gtest/gmock targets carry header search path
-  # dependencies automatically when using CMake 2.8.11 or
-  # later. Otherwise we have to add them here ourselves.
-  if(CMAKE_VERSION VERSION_LESS 2.8.11)
-      include_directories("${gtest_SOURCE_DIR}/include"
-                          "${gmock_SOURCE_DIR}/include")
-  endif()
+  CPMAddPackage(
+    NAME googletest
+    GITHUB_REPOSITORY google/googletest
+    GIT_TAG  v1.17.0
+    VERSION 1.17.0
+    OPTIONS "INSTALL_GTEST OFF" "gtest_force_shared_crt"
+ )
 
   add_executable(codecs src/codecs.cpp)
   target_link_libraries(codecs FastPFOR)
@@ -187,7 +164,7 @@ if(WITH_TEST)
   enable_testing()
   add_test("FastPFOR_unittest" FastPFOR_unittest)
 endif()
-
+ 
 include(GNUInstallDirs)
 install(TARGETS FastPFOR
     EXPORT FastPFORExport
