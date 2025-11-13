@@ -9,11 +9,6 @@ set (CMAKE_CXX_STANDARD 11) # for constexpr specifier and other goodies
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 set (CMAKE_C_STANDARD 99)
 set(CMAKE_C_STANDARD_REQUIRED True)
-if (NOT CMAKE_BUILD_TYPE)
-		message(STATUS "No build type selected, default to Release")
-		set(CMAKE_BUILD_TYPE Release CACHE STRING "Choose the type of build." FORCE)
-endif()
-MESSAGE( STATUS "CMAKE_BUILD_TYPE: " ${CMAKE_BUILD_TYPE} )
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake_modules")
 include(AppendCompilerFlags)
@@ -71,6 +66,23 @@ target_sources(FastPFOR PRIVATE
     src/streamvbyte.c
 )
 set_target_properties(FastPFOR PROPERTIES POSITION_INDEPENDENT_CODE TRUE)
+
+option(FASTPFOR_SANITIZE "Use sanitizers" OFF)
+
+if(FASTPFOR_SANITIZE)
+  message(STATUS "Enabling Sanitizers")
+  target_compile_options(FastPFOR PUBLIC -fsanitize=address  -fno-omit-frame-pointer -fno-sanitize-recover=all)
+  target_compile_definitions(FastPFOR PUBLIC ASAN_OPTIONS=detect_leaks=1)
+  target_link_libraries(FastPFOR PUBLIC -fsanitize=address  -fno-omit-frame-pointer -fno-sanitize-recover=all)
+endif()
+
+if (NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES AND NOT FASTPFOR_SANITIZE)
+		message(STATUS "No build type selected, default to Release")
+		set(CMAKE_BUILD_TYPE Release CACHE STRING "Choose the type of build." FORCE)
+endif()
+MESSAGE( STATUS "CMAKE_BUILD_TYPE: " ${CMAKE_BUILD_TYPE} )
+
+
 if(${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU" OR ${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang" OR ${CMAKE_CXX_COMPILER_ID} STREQUAL "AppleClang")
   target_compile_options(FastPFOR PRIVATE -Wall -Wextra)
 endif()
@@ -78,7 +90,7 @@ include(CheckCXXCompilerFlag)
 unset(FASTPFOR_COMPILER_SUPPORTS_MARCH_NATIVE CACHE)
 CHECK_CXX_COMPILER_FLAG(-march=native FASTPFOR_COMPILER_SUPPORTS_MARCH_NATIVE)
 if(FASTPFOR_COMPILER_SUPPORTS_MARCH_NATIVE)
-    add_compile_options(-march=native)
+    target_compile_options(FastPFOR PRIVATE -march=native)
 else()
      message(STATUS "native target not supported")
 endif()
@@ -161,9 +173,9 @@ else()
     target_link_libraries(inmemorybenchmarksnappy FastPFOR ${snappy_LIBRARIES})
 endif()
 
-option(WITH_TEST "Build with Google Test" ON)
+option(FASTPFOR_WITH_TEST "Build with Google Test" ON)
 
-if(WITH_TEST)
+if(FASTPFOR_WITH_TEST)
   CPMAddPackage(
     NAME googletest
     GITHUB_REPOSITORY google/googletest
