@@ -10,7 +10,7 @@ It is broadly applicable to the compression of arrays of
 The library seeks to exploit SIMD instructions (SSE)
 whenever possible.
 
-This library can decode at least 4 billions of compressed integers per second on most
+This library can decode at least 4 billions of compressed integers per second on most x64
 desktop or laptop processors. That is, it can decompress data at a rate of 15 GB/s.
 This is significantly faster than generic codecs like gzip, LZO, Snappy or LZ4.
 
@@ -129,7 +129,8 @@ On an x64 platform, your processor should support SSSE3. This includes almost ev
 sold after 2006. (Note: the key schemes require merely SSE2.)  Some specific binaries will only run if your processor 
 supports SSE4.1. They have been purely used for specific tests however.
 
-We also support ARM platforms through SIMDe, by wrapping.
+We also support ARM platforms through SIMDe, by wrapping. The performance might be poor. If you would
+like to contribute native ARM support, please provide a pull request.
 
 ## Building with CMake
 
@@ -137,10 +138,9 @@ You need cmake. On most linux distributions, you can simply do the following:
 
       git clone https://github.com/lemire/FastPFor.git
       cd FastPFor
-      mkdir build
-      cd build
-      cmake ..
-      cmake --build .
+      cmake -B build
+      cmake --build build
+      ctest --test-dir build
 
 It may be necessary to set the CXX variable. The project is installable (`make install` works).
 
@@ -182,15 +182,16 @@ See  Encoding: Integer Compression Libraries for Go https://github.com/zhenjl/en
 If you used CMake to generate the build files, the `check` target will
 run the unit tests. For example , if you generated Unix Makefiles
 
-    make check
+    ctest --test-dir build
 
 will do it. 
 
 ## Simple benchmark
 
-    make codecs
-    ./codecs --clusterdynamic
-    ./codecs --uniformdynamic
+    cmake -B build
+    cmake --build build
+    ./build/codecs --clusterdynamic
+    ./build/codecs --uniformdynamic
 
 ## Optional : Snappy
 
@@ -201,9 +202,6 @@ Google snappy. You can do so on a recent ubuntu machine as:
     sudo apt-get install libsnappy-dev
 
 ## Processing data files
-
-Typing "make" will generate an "inmemorybenchmark"
-executable that can process data files.
 
 You can use it to process arrays on (sorted!) integers
 on disk using the following 32-bit format: 1 unsigned 32-bit
@@ -220,8 +218,6 @@ process it with our inmemorybenchmark:
 
 The "minlength" flag skips short arrays. (Warning: timings over
 short arrays are unreliable.)
-
-
 
 
 ## I used your code and I get segmentation faults
