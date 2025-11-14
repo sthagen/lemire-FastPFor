@@ -84,7 +84,7 @@ MESSAGE( STATUS "CMAKE_BUILD_TYPE: " ${CMAKE_BUILD_TYPE} )
 
 
 if(${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU" OR ${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang" OR ${CMAKE_CXX_COMPILER_ID} STREQUAL "AppleClang")
-  target_compile_options(FastPFOR PRIVATE -Wall -Wextra)
+   target_compile_options(FastPFOR PRIVATE -Wall -Wextra  -Weffc++ -Wsign-compare -Wshadow -Wwrite-strings -Wpointer-arith -Winit-self -Wconversion -Wno-sign-conversion)
 endif()
 include(CheckCXXCompilerFlag)
 unset(FASTPFOR_COMPILER_SUPPORTS_MARCH_NATIVE CACHE)
