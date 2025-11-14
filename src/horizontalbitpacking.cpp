@@ -31,18 +31,18 @@ static void SIMD_nullunpacker32(const uint8_t *, uint32_t *out) {
 static void simdhunpack1(const uint8_t *  in,uint32_t *  out) {
     __m128i* pCurr = reinterpret_cast<__m128i*>(out);
     const static __m128i andmask = _mm_set_epi8
-(-128,1<<6,1<<5,1<<4,1<<3,1<<2,1<<1,1<<0,-128,1<<6,1<<5,1<<4,1<<3,1<<2,1<<1,1<<0);
+((char)-128,(char)(1<<6),(char)(1<<5),(char)(1<<4),(char)(1<<3),(char)(1<<2),(char)(1<<1),(char)(1<<0),(char)-128,(char)(1<<6),(char)(1<<5),(char)(1<<4),(char)(1<<3),(char)(1<<2),(char)(1<<1),(char)(1<<0));
     const static __m128i shufmask = _mm_set_epi8
-(1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0);
-    const static __m128i allones = _mm_set1_epi8 (1);
+((char)1,(char)1,(char)1,(char)1,(char)1,(char)1,(char)1,(char)1,(char)0,(char)0,(char)0,(char)0,(char)0,(char)0,(char)0,(char)0);
+    const static __m128i allones = _mm_set1_epi8 ((char)1);
     const static __m128i finalshufmask1 = _mm_set_epi8
-(-128,-128,-128,3,-128,-128,-128,2,-128,-128,-128,1,-128,-128,-128,0);
+((char)-128,(char)-128,(char)-128,(char)3,(char)-128,(char)-128,(char)-128,(char)2,(char)-128,(char)-128,(char)-128,(char)1,(char)-128,(char)-128,(char)-128,(char)0);
     const static __m128i finalshufmask2 = _mm_set_epi8
-(-128,-128,-128,7,-128,-128,-128,6,-128,-128,-128,5,-128,-128,-128,4);
+((char)-128,(char)-128,(char)-128,(char)7,(char)-128,(char)-128,(char)-128,(char)6,(char)-128,(char)-128,(char)-128,(char)5,(char)-128,(char)-128,(char)-128,(char)4);
     const static __m128i finalshufmask3 = _mm_set_epi8
-(-128,-128,-128,11,-128,-128,-128,10,-128,-128,-128,9,-128,-128,-128,8);
+((char)-128,(char)-128,(char)-128,(char)11,(char)-128,(char)-128,(char)-128,(char)10,(char)-128,(char)-128,(char)-128,(char)9,(char)-128,(char)-128,(char)-128,(char)8);
     const static __m128i finalshufmask4 = _mm_set_epi8
-(-128,-128,-128,15,-128,-128,-128,14,-128,-128,-128,13,-128,-128,-128,12);
+((char)-128,(char)-128,(char)-128,(char)15,(char)-128,(char)-128,(char)-128,(char)14,(char)-128,(char)-128,(char)-128,(char)13,(char)-128,(char)-128,(char)-128,(char)12);
     for (uint32_t j = 0; j<8;++j) {
         __m128i ba = _mm_loadu_si128(reinterpret_cast<const __m128i*>(in + 2 *
 j));
@@ -151,17 +151,17 @@ static  void simdhunpack4(const uint8_t *  in,uint32_t *  out) {
 
     enum{ b = 4};
     __m128i* pCurr = reinterpret_cast<__m128i*>(out);
-    const static __m128i shuf8 =  _mm_set_epi8 (13,12, 15,14, 9,8, 11,10, 5,4,
-7,6, 1,0, 3,2);
+    const static __m128i shuf8 =  _mm_set_epi8 ((char)13,(char)12, (char)15,(char)14, (char)9,(char)8, (char)11,(char)10, (char)5,(char)4,
+(char)7,(char)6, (char)1,(char)0, (char)3,(char)2);
     const static __m128i shufoneoutoftwo =  _mm_set1_epi32 (252645135);
-    const static __m128i shufmid8_1 =  _mm_set_epi8 (-128, -128, -128, 3, -128,
--128, -128, 1, -128, -128, -128, 2, -128, -128, -128, 0);
-    const static __m128i shufmid8_2 =  _mm_set_epi8 (-128, -128, -128, 7, -128,
--128, -128, 5, -128, -128, -128, 6, -128, -128, -128, 4);
-    const static __m128i shufmid8_3 =  _mm_set_epi8 (-128, -128, -128, 11, -128,
--128, -128, 9, -128, -128, -128, 10, -128, -128, -128, 8);
-    const static __m128i shufmid8_4 =  _mm_set_epi8 (-128, -128, -128, 15, -128,
--128, -128, 13, -128, -128, -128, 14, -128, -128, -128, 12);
+    const static __m128i shufmid8_1 =  _mm_set_epi8 ((char)-128, (char)-128, (char)-128, (char)3, (char)-128,
+(char)-128, (char)-128, (char)1, (char)-128, (char)-128, (char)-128, (char)2, (char)-128, (char)-128, (char)-128, (char)0);
+    const static __m128i shufmid8_2 =  _mm_set_epi8 ((char)-128, (char)-128, (char)-128, (char)7, (char)-128,
+(char)-128, (char)-128, (char)5, (char)-128, (char)-128, (char)-128, (char)6, (char)-128, (char)-128, (char)-128, (char)4);
+    const static __m128i shufmid8_3 =  _mm_set_epi8 ((char)-128, (char)-128, (char)-128, (char)11, (char)-128,
+(char)-128, (char)-128, (char)9, (char)-128, (char)-128, (char)-128, (char)10, (char)-128, (char)-128, (char)-128, (char)8);
+    const static __m128i shufmid8_4 =  _mm_set_epi8 ((char)-128, (char)-128, (char)-128, (char)15, (char)-128,
+(char)-128, (char)-128, (char)13, (char)-128, (char)-128, (char)-128, (char)14, (char)-128, (char)-128, (char)-128, (char)12);
     for (uint32_t j = 0; j<4;++j) {
         const __m128i ba = _mm_loadu_si128(reinterpret_cast<const __m128i*>(in +
 16 * j));
@@ -833,10 +833,10 @@ static void simdhunpack29(const uint8_t *in, uint32_t *out) {
         _mm_loadu_si128(reinterpret_cast<const __m128i *>(in + b * j));
     __m128i ca = _mm_blend_epi16(tmp, _mm_slli_epi64(tmp, 3), 236);
     const static __m128i x2 =
-        _mm_set_epi8(14, 13, 12, 11, 10, 9, 8, 7, 7, 6, 5, 4, 3, 2, 1, 0);
+        _mm_set_epi8((char)14, (char)13, (char)12, (char)11, (char)10, (char)9, (char)8, (char)7, (char)7, (char)6, (char)5, (char)4, (char)3, (char)2, (char)1, (char)0);
     ca = _mm_shuffle_epi8(ca, x2);
     const static __m128i x1 =
-        _mm_set_epi8(14, 13, 12, 11, 10, 9, 8, 7, 7, 6, 5, 4, 3, 2, 1, 0);
+        _mm_set_epi8((char)14, (char)13, (char)12, (char)11, (char)10, (char)9, (char)8, (char)7, (char)7, (char)6, (char)5, (char)4, (char)3, (char)2, (char)1, (char)0);
     ca = _mm_blend_epi16(ca, _mm_shuffle_epi8(tmp, x1), 51);
     ca = _mm_mullo_epi32(ca, multi1_29);
     ca = _mm_srli_epi32(ca, shift1);
