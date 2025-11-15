@@ -11,6 +11,10 @@ TEST(Simple16Test, DecodesWithUnknownLength) {
   for (uint32_t i = 0; i < 128; ++i) {
     in.push_back(i);
   }
-  verifyUnknownInputLengthDecode(codec, in);
+
+  // Simple16 may overrun the output buffer regardless of `n`, so a headroom of
+  // 28 (the maximum number of elements in a single pack) is added.
+  std::vector<uint32_t> decoded(in.size() + 28, 0);
+  verifyUnknownInputLengthDecode(codec, in, decoded);
 }
 } // namespace FastPForLib

@@ -11,6 +11,8 @@ TEST(Simple8bTest, DecodesWithUnknownLength) {
   for (uint32_t i = 0; i < 128; ++i) {
     in.push_back(i);
   }
-  verifyUnknownInputLengthDecode(codec, in);
+
+  std::vector<uint32_t> decoded(in.size(), 0);
+  verifyUnknownInputLengthDecode(codec, in, decoded);
 }
 } // namespace FastPForLib

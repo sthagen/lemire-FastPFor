@@ -8,16 +8,18 @@
 namespace FastPForLib {
 
 template <class Codec>
-void verifyUnknownInputLengthDecode(Codec &codec, const std::vector<uint32_t> &in) {
+void verifyUnknownInputLengthDecode(Codec &codec,
+                                    const std::vector<uint32_t> &in,
+                                    std::vector<uint32_t> &decoded) {
   std::vector<uint32_t> encoded(in.size() * 2, 0);
   size_t encodedSize;
   codec.encodeArray(in.data(), in.size(), encoded.data(), encodedSize);
   encoded.resize(encodedSize);
 
-  std::vector<uint32_t> decoded(in.size(), 0);
   size_t n = in.size();
   const uint32_t *decodedUntil =
       codec.decodeArray(encoded.data(), 0, decoded.data(), n);
+  decoded.resize(n);
 
   // Check that the decoded size matches the input size.
   EXPECT_EQ(n, in.size());
