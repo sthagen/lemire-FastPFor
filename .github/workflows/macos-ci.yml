@@ -7,10 +7,13 @@ jobs:
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v2
-      - name: Use cmake
+      - name: Use cmake (default)
         run: |
-          mkdir build
-          cd build
-          cmake  ..
-          cmake --build . 
-          ctest . --output-on-failure
+          cmake -B build -D CMAKE_BUILD_TYPE=Release
+          cmake --build build
+          ctest --test-dir build --output-on-failure
+      - name: Use cmake (debug)
+        run: |
+          cmake -B build  -D CMAKE_BUILD_TYPE=Debug
+          cmake --build build
+          ctest --test-dir build --output-on-failure

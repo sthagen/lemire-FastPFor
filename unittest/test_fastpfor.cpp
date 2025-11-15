@@ -387,7 +387,7 @@ namespace FastPForLib {
     _verify64();
   }
 
-  INSTANTIATE_TEST_CASE_P(
+  INSTANTIATE_TEST_SUITE_P(
       FastPForLib,
       FastPForTest,
       Values("FastPFor128",

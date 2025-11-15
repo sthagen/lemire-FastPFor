@@ -3,21 +3,17 @@
 #
 # Copyright (c) 2012 Louis Dionne
 #
-cmake_minimum_required(VERSION 3.5)
+cmake_minimum_required(VERSION 3.10)
 
 set (CMAKE_CXX_STANDARD 11) # for constexpr specifier and other goodies
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 set (CMAKE_C_STANDARD 99)
 set(CMAKE_C_STANDARD_REQUIRED True)
-if (NOT CMAKE_BUILD_TYPE)
-		message(STATUS "No build type selected, default to Release")
-		set(CMAKE_BUILD_TYPE Release CACHE STRING "Choose the type of build." FORCE)
-endif()
-MESSAGE( STATUS "CMAKE_BUILD_TYPE: " ${CMAKE_BUILD_TYPE} )
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake_modules")
 include(AppendCompilerFlags)
 
+include(cmake/CPM.cmake)
 
 project(FastPFOR CXX C)
 set(PROJECT_URL "https://github.com/fast-pack/FastPFOR")
@@ -52,29 +48,13 @@ else()
 endif()
 
 
-
-if(${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU" OR ${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang" OR ${CMAKE_CXX_COMPILER_ID} STREQUAL "AppleClang")
-  add_compile_options(-Wall -Wextra)
-endif()
-include(CheckCXXCompilerFlag)
-unset(FASTPFOR_COMPILER_SUPPORTS_MARCH_NATIVE CACHE)
-CHECK_CXX_COMPILER_FLAG(-march=native FASTPFOR_COMPILER_SUPPORTS_MARCH_NATIVE)
-if(FASTPFOR_COMPILER_SUPPORTS_MARCH_NATIVE)
-    add_compile_options(-march=native)
-else()
-     message(STATUS "native target not supported")
-endif()
-
-MESSAGE( STATUS "CMAKE_CXX_FLAGS_DEBUG: " ${CMAKE_CXX_FLAGS_DEBUG} )
-MESSAGE( STATUS "CMAKE_CXX_FLAGS_RELEASE: " ${CMAKE_CXX_FLAGS_RELEASE} )
-MESSAGE( STATUS "CMAKE_C_FLAGS_DEBUG: " ${CMAKE_C_FLAGS_DEBUG} )
-MESSAGE( STATUS "CMAKE_C_FLAGS_RELEASE: " ${CMAKE_C_FLAGS_RELEASE} )
-
-
-
 # library target
-include_directories(headers)
-add_library(FastPFOR STATIC
+add_library(FastPFOR STATIC)
+target_include_directories(FastPFOR PUBLIC 
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/headers>
+    $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/fastpfor>
+)
+target_sources(FastPFOR PRIVATE
     src/bitpacking.cpp
     src/bitpackingaligned.cpp
     src/bitpackingunaligned.cpp
@@ -83,24 +63,61 @@ add_library(FastPFOR STATIC
     src/codecfactory.cpp
     src/simdbitpacking.cpp
     src/varintdecode.c
-    src/streamvbyte.c)
+    src/streamvbyte.c
+)
 set_target_properties(FastPFOR PROPERTIES POSITION_INDEPENDENT_CODE TRUE)
 
-#if (NOT WIN32)
-#  target_link_libraries(FastPFOR m)
-#endif()
+option(FASTPFOR_SANITIZE "Use sanitizers" OFF)
+
+if(FASTPFOR_SANITIZE)
+  message(STATUS "Enabling Sanitizers")
+  target_compile_options(FastPFOR PUBLIC -fsanitize=address  -fno-omit-frame-pointer -fno-sanitize-recover=all)
+  target_compile_definitions(FastPFOR PUBLIC ASAN_OPTIONS=detect_leaks=1)
+  target_link_libraries(FastPFOR PUBLIC -fsanitize=address  -fno-omit-frame-pointer -fno-sanitize-recover=all)
+endif()
+
+if (NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES AND NOT FASTPFOR_SANITIZE)
+		message(STATUS "No build type selected, default to Release")
+		set(CMAKE_BUILD_TYPE Release CACHE STRING "Choose the type of build." FORCE)
+endif()
+MESSAGE( STATUS "CMAKE_BUILD_TYPE: " ${CMAKE_BUILD_TYPE} )
+
+
+if(${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU" OR ${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang" OR ${CMAKE_CXX_COMPILER_ID} STREQUAL "AppleClang")
+   target_compile_options(FastPFOR PRIVATE -Wall -Wextra  -Weffc++ -Wsign-compare -Wshadow -Wwrite-strings -Wpointer-arith -Winit-self -Wconversion -Wno-sign-conversion)
+endif()
+include(CheckCXXCompilerFlag)
+unset(FASTPFOR_COMPILER_SUPPORTS_MARCH_NATIVE CACHE)
+CHECK_CXX_COMPILER_FLAG(-march=native FASTPFOR_COMPILER_SUPPORTS_MARCH_NATIVE)
+if(FASTPFOR_COMPILER_SUPPORTS_MARCH_NATIVE)
+    target_compile_options(FastPFOR PRIVATE -march=native)
+else()
+    message(STATUS "native target not supported")
+endif()
+
+MESSAGE( STATUS "CMAKE_CXX_FLAGS_DEBUG: " ${CMAKE_CXX_FLAGS_DEBUG} )
+MESSAGE( STATUS "CMAKE_CXX_FLAGS_RELEASE: " ${CMAKE_CXX_FLAGS_RELEASE} )
+MESSAGE( STATUS "CMAKE_C_FLAGS_DEBUG: " ${CMAKE_C_FLAGS_DEBUG} )
+MESSAGE( STATUS "CMAKE_C_FLAGS_RELEASE: " ${CMAKE_C_FLAGS_RELEASE} )
 
 
 # other executables
 add_executable(gapstats src/gapstats.cpp)
+target_link_libraries(gapstats PRIVATE FastPFOR)
+
 add_executable(partitionbylength src/partitionbylength.cpp)
+target_link_libraries(partitionbylength PRIVATE FastPFOR)
+
 add_executable(csv2maropu src/csv2maropu.cpp)
+target_link_libraries(csv2maropu PRIVATE FastPFOR)
 
 if (SUPPORT_NEON)
     target_link_libraries(FastPFOR PUBLIC simde)
     target_link_libraries(gapstats PUBLIC simde)
     target_link_libraries(partitionbylength PUBLIC simde)
     target_link_libraries(csv2maropu PUBLIC simde)
+else()
+    message(STATUS "SIMDE not used")
 endif()
 
 add_executable(entropy src/entropy.cpp)
@@ -128,42 +145,16 @@ else()
     target_link_libraries(inmemorybenchmarksnappy FastPFOR ${snappy_LIBRARIES})
 endif()
 
-option(WITH_TEST "Build with Google Test" ON)
+option(FASTPFOR_WITH_TEST "Build with Google Test" ON)
 
-if(WITH_TEST)
-  # Download and unpack googletest at configure time
-  configure_file(CMakeLists.txt.in googletest-download/CMakeLists.txt)
-  execute_process(COMMAND ${CMAKE_COMMAND} -G "${CMAKE_GENERATOR}" .
-    RESULT_VARIABLE result
-    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/googletest-download )
-  if(result)
-    message(FATAL_ERROR "CMake step for googletest failed: ${result}")
-  endif()
-  execute_process(COMMAND ${CMAKE_COMMAND} --build .
-    RESULT_VARIABLE result
-    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/googletest-download )
-  if(result)
-    message(FATAL_ERROR "Build step for googletest failed: ${result}")
-  endif()
-
-  # Prevent GoogleTest from overriding our compiler/linker options
-  # when building with Visual Studio
-  set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
-
-  # Add googletest directly to our build. This adds
-  # the following targets: gtest, gtest_main, gmock
-  # and gmock_main
-  add_subdirectory(${CMAKE_CURRENT_BINARY_DIR}/googletest-src
-                   ${CMAKE_CURRENT_BINARY_DIR}/googletest-build
-                   EXCLUDE_FROM_ALL)
-
-  # The gtest/gmock targets carry header search path
-  # dependencies automatically when using CMake 2.8.11 or
-  # later. Otherwise we have to add them here ourselves.
-  if(CMAKE_VERSION VERSION_LESS 2.8.11)
-      include_directories("${gtest_SOURCE_DIR}/include"
-                          "${gmock_SOURCE_DIR}/include")
-  endif()
+if(FASTPFOR_WITH_TEST)
+  CPMAddPackage(
+    NAME googletest
+    GITHUB_REPOSITORY google/googletest
+    GIT_TAG  v1.17.0
+    VERSION 1.17.0
+    OPTIONS "INSTALL_GTEST OFF" "gtest_force_shared_crt"
+ )
 
   add_executable(codecs src/codecs.cpp)
   target_link_libraries(codecs FastPFOR)
@@ -187,7 +178,7 @@ if(WITH_TEST)
   enable_testing()
   add_test("FastPFOR_unittest" FastPFOR_unittest)
 endif()
-
+ 
 include(GNUInstallDirs)
 install(TARGETS FastPFOR
     EXPORT FastPFORExport
@@ -218,3 +209,10 @@ endif()
 configure_file("fastpfor.pc.in" "${CMAKE_CURRENT_BINARY_DIR}/fastpfor.pc" @ONLY)
 install(FILES "${CMAKE_CURRENT_BINARY_DIR}/fastpfor.pc"
     DESTINATION "${CMAKE_INSTALL_LIBDIR}/pkgconfig")
+
+
+if (SUPPORT_NEON)
+    message(WARNING "Building with emulation with SIMDE for ARM NEON support.")
+    message(WARNING "We do not actually support ARM NEON natively.")
+    message(WARNING "If you actually want native ARM NEON support, please consider providing a patch.")
+endif()

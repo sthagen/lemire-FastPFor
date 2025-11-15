@@ -1241,7 +1241,7 @@ size_t masked_vbyte_read_loop(const uint8_t *in, uint32_t *out,
     uint64_t eaten =
         masked_vbyte_read_group(in + consumed, out + count, sig, &ints_read);
     consumed += eaten;
-    availablebytes -= eaten;
+    availablebytes -= (int)eaten;
     sig >>= eaten;
     count += ints_read;
   }
@@ -1359,7 +1359,7 @@ size_t altmasked_vbyte_read_loop(const uint8_t *in, uint32_t *out,
     uint64_t eaten =
         masked_vbyte_read_group(in + consumed, out + count, sig, &ints_read);
     consumed += eaten;
-    availablebytes -= eaten;
+    availablebytes -= (int)eaten;
     sig >>= eaten;
     count += ints_read;
   }
@@ -1477,7 +1477,7 @@ size_t masked_vbyte_read_loop_fromcompressedsize(const uint8_t *in,
     uint64_t bytes =
         masked_vbyte_read_group(in + consumed, out, sig, &ints_read);
     consumed += bytes;
-    availablebytes -= bytes;
+    availablebytes -= (int)bytes;
     sig >>= bytes;
     out += ints_read;
   }
@@ -1605,7 +1605,7 @@ size_t altmasked_vbyte_read_loop_fromcompressedsize(const uint8_t *in,
     uint64_t bytes =
         masked_vbyte_read_group(in + consumed, out, sig, &ints_read);
     consumed += bytes;
-    availablebytes -= bytes;
+    availablebytes -= (int)bytes;
     sig >>= bytes;
     out += ints_read;
   }
