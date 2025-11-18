@@ -7,6 +7,9 @@
  *      Fabrizio Silvestri <fabrizio.silvestri_at_isti.cnr.it>
  *      Rossano Venturini <rossano.venturini_at_isti.cnr.it>
  *   which was available  under the Apache License, Version 2.0.
+ *
+ * The Simple9 scheme may overflow the buffer when decoding.
+ * This is a limitation of the original implementation..
  */
 #ifndef SIMPLE9_H_
 #define SIMPLE9_H_

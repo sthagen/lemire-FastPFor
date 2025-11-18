@@ -7,6 +7,9 @@
  *      Fabrizio Silvestri <fabrizio.silvestri_at_isti.cnr.it>
  *      Rossano Venturini <rossano.venturini_at_isti.cnr.it>
  *   which was available  under the Apache License, Version 2.0.
+ *
+ * The Simple16 scheme may overflow the buffer when decoding.
+ * This is a limitation of the original implementation..
  */
 
 #ifndef SIMPLE16_H_
@@ -745,7 +748,7 @@ const uint32_t *Simple16<MarkLength>::decodeArray(const uint32_t *in,
     printf("simple16 stats[%u]=%f\n", k, stats[k] * 1.0 / sum);
   }
 #endif
-  ASSERT(in <= endin, std::to_string(in - endin));
+  ASSERT(len == 0 || in <= endin, std::to_string(in - endin));
   return in;
 }
 
