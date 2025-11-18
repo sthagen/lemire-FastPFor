@@ -222,10 +222,11 @@ short arrays are unreliable.)
 
 ## I used your code and I get segmentation faults
 
-Our code is thoroughly tested, but some experimental schemes can overwrite 
-in the receiving buffer (deliberately). This is a research library not
-all schemes are meant for production use. *Please review carefully the
-code prior to using it.*
+Our code is thoroughly tested.
+
+Some experimental schemes can overwrite in the receiving buffer (deliberately). 
+These includes Simple 9 and Simple 16 (which we recovered from the inventor's
+implementations). These limitations could be fixed (pull request invited).
 
 One common issue is that people do not provide large enough buffers.
 Some schemes can have such small compression rates that the compressed data
