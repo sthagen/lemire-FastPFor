@@ -193,22 +193,45 @@ static inline __m128i _mm_shuffle_epi8(__m128i a, __m128i b) {
   return vreinterpretq_s64_u8(vqtbl1q_u8(tbl, idx));
 }
 static inline __m128i _mm_shuffle_epi32(__m128i a, const int imm) {
-  uint32_t t[4];
-  uint32_t r[4];
-  vst1q_u32(t, vreinterpretq_u32_s64(a));
-  r[0] = t[imm & 3];
-  r[1] = t[(imm >> 2) & 3];
-  r[2] = t[(imm >> 4) & 3];
-  r[3] = t[(imm >> 6) & 3];
-  return vreinterpretq_s64_u32(vld1q_u32(r));
+  /* Permute the four 32-bit lanes. `imm` is a compile-time constant at every
+   * call site, so the broadcast fast paths fold away and the general case
+   * builds a constant byte index that compiles to a single TBL. */
+  uint32x4_t v = vreinterpretq_u32_s64(a);
+  if (imm == 0x00)
+    return vreinterpretq_s64_u32(vdupq_laneq_u32(v, 0));
+  if (imm == 0x55)
+    return vreinterpretq_s64_u32(vdupq_laneq_u32(v, 1));
+  if (imm == 0xAA)
+    return vreinterpretq_s64_u32(vdupq_laneq_u32(v, 2));
+  if (imm == 0xFF)
+    return vreinterpretq_s64_u32(vdupq_laneq_u32(v, 3));
+  {
+    const uint8_t b0 = (uint8_t)((imm & 3) * 4);
+    const uint8_t b1 = (uint8_t)(((imm >> 2) & 3) * 4);
+    const uint8_t b2 = (uint8_t)(((imm >> 4) & 3) * 4);
+    const uint8_t b3 = (uint8_t)(((imm >> 6) & 3) * 4);
+    const uint8x16_t idx = {
+        b0, (uint8_t)(b0 + 1), (uint8_t)(b0 + 2), (uint8_t)(b0 + 3),
+        b1, (uint8_t)(b1 + 1), (uint8_t)(b1 + 2), (uint8_t)(b1 + 3),
+        b2, (uint8_t)(b2 + 1), (uint8_t)(b2 + 2), (uint8_t)(b2 + 3),
+        b3, (uint8_t)(b3 + 1), (uint8_t)(b3 + 2), (uint8_t)(b3 + 3)};
+    return vreinterpretq_s64_u8(vqtbl1q_u8(vreinterpretq_u8_s64(a), idx));
+  }
 }
 static inline __m128i _mm_blend_epi16(__m128i a, __m128i b, const int imm) {
-  uint16_t m[8];
-  int i;
-  for (i = 0; i < 8; i++)
-    m[i] = ((imm >> i) & 1) ? (uint16_t)0xFFFF : (uint16_t)0;
-  return vreinterpretq_s64_u16(vbslq_u16(vld1q_u16(m),
-                                         vreinterpretq_u16_s64(b),
+  /* Per-16-bit-lane select from `a` (0) or `b` (1). `imm` is constant at every
+   * call site, so this compound-literal mask folds to a constant vector load
+   * feeding a single BSL, with no stack round-trip. */
+  const uint16x8_t mask = {
+      (imm & 0x01) ? (uint16_t)0xFFFF : (uint16_t)0,
+      (imm & 0x02) ? (uint16_t)0xFFFF : (uint16_t)0,
+      (imm & 0x04) ? (uint16_t)0xFFFF : (uint16_t)0,
+      (imm & 0x08) ? (uint16_t)0xFFFF : (uint16_t)0,
+      (imm & 0x10) ? (uint16_t)0xFFFF : (uint16_t)0,
+      (imm & 0x20) ? (uint16_t)0xFFFF : (uint16_t)0,
+      (imm & 0x40) ? (uint16_t)0xFFFF : (uint16_t)0,
+      (imm & 0x80) ? (uint16_t)0xFFFF : (uint16_t)0};
+  return vreinterpretq_s64_u16(vbslq_u16(mask, vreinterpretq_u16_s64(b),
                                          vreinterpretq_u16_s64(a)));
 }
 
