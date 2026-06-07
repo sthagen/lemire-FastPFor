@@ -10,7 +10,7 @@
     #if (defined(_M_IX86) || defined(_M_AMD64))
     #include <intrin.h>
     #elif defined(_M_ARM64)
-    #include <simde/x86/sse4.1.h>
+    #include "fastpfor_neon.h"
     #endif
 
     #include <iso646.h>
@@ -21,7 +21,7 @@
     #include <x86intrin.h>
 #elif defined(__aarch64__)
     /* GCC-compatible compiler, targeting ARM with NEON */
-    #include <simde/x86/sse4.1.h>
+    #include "fastpfor_neon.h"
 #elif defined(__GNUC__) && defined(__IWMMXT__)
     /* GCC-compatible compiler, targeting ARM with WMMX */
     #include <mmintrin.h>

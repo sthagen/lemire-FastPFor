@@ -40,17 +40,22 @@ if( SUPPORT_SSE42 )
     MESSAGE( STATUS "SSE 4.2 support detected" )
 else()
     if (SUPPORT_NEON)
-        include(simde)
-        MESSAGE(STATUS "USING SIMDE FOR SIMD OPERATIONS")
+        MESSAGE(STATUS "Using native ARM NEON intrinsics for SIMD operations")
     else ()
-        MESSAGE(STATUS "SIMDE and SSE 4.2 support not detected")
+        MESSAGE(STATUS "Neither SSE 4.2 nor ARM NEON support detected")
     endif ()
 endif()
 
 
+# GNUInstallDirs defines CMAKE_INSTALL_INCLUDEDIR (and friends), which is used
+# below in the INSTALL_INTERFACE include path. It must be included before that
+# expansion, otherwise the variable is empty and the exported target ends up
+# with a bogus "/fastpfor" include directory that breaks find_package().
+include(GNUInstallDirs)
+
 # library target
 add_library(FastPFOR STATIC)
-target_include_directories(FastPFOR PUBLIC 
+target_include_directories(FastPFOR PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/headers>
     $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/fastpfor>
 )
@@ -133,14 +138,6 @@ target_link_libraries(partitionbylength PRIVATE FastPFOR)
 add_executable(csv2maropu src/csv2maropu.cpp)
 target_link_libraries(csv2maropu PRIVATE FastPFOR)
 
-if (SUPPORT_NEON)
-    target_link_libraries(FastPFOR PUBLIC simde)
-    target_link_libraries(gapstats PUBLIC simde)
-    target_link_libraries(partitionbylength PUBLIC simde)
-    target_link_libraries(csv2maropu PUBLIC simde)
-else()
-    message(STATUS "SIMDE not used")
-endif()
 
 add_executable(entropy src/entropy.cpp)
 target_link_libraries(entropy FastPFOR)
@@ -202,8 +199,7 @@ if(FASTPFOR_WITH_TEST)
   enable_testing()
   add_test("FastPFOR_unittest" FastPFOR_unittest)
 endif()
- 
-include(GNUInstallDirs)
+
 install(TARGETS FastPFOR
     EXPORT FastPFORExport
     ARCHIVE DESTINATION "${CMAKE_INSTALL_LIBDIR}"
@@ -236,7 +232,5 @@ install(FILES "${CMAKE_CURRENT_BINARY_DIR}/fastpfor.pc"
 
 
 if (SUPPORT_NEON)
-    message(WARNING "Building with emulation with SIMDE for ARM NEON support.")
-    message(WARNING "We do not actually support ARM NEON natively.")
-    message(WARNING "If you actually want native ARM NEON support, please consider providing a patch.")
+    message(STATUS "Building with native ARM NEON support (no SIMD emulation layer).")
 endif()
