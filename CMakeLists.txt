@@ -47,9 +47,15 @@ else()
 endif()
 
 
+# GNUInstallDirs defines CMAKE_INSTALL_INCLUDEDIR (and friends), which is used
+# below in the INSTALL_INTERFACE include path. It must be included before that
+# expansion, otherwise the variable is empty and the exported target ends up
+# with a bogus "/fastpfor" include directory that breaks find_package().
+include(GNUInstallDirs)
+
 # library target
 add_library(FastPFOR STATIC)
-target_include_directories(FastPFOR PUBLIC 
+target_include_directories(FastPFOR PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/headers>
     $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/fastpfor>
 )
@@ -193,8 +199,7 @@ if(FASTPFOR_WITH_TEST)
   enable_testing()
   add_test("FastPFOR_unittest" FastPFOR_unittest)
 endif()
- 
-include(GNUInstallDirs)
+
 install(TARGETS FastPFOR
     EXPORT FastPFORExport
     ARCHIVE DESTINATION "${CMAKE_INSTALL_LIBDIR}"
