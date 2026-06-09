@@ -135,8 +135,8 @@ On an x64 platform, your processor should support SSSE3. This includes almost ev
 sold after 2006. (Note: the key schemes require merely SSE2.)  Some specific binaries will only run if your processor 
 supports SSE4.1. They have been purely used for specific tests however.
 
-We also support ARM platforms through SIMDe, by wrapping. The performance might be poor. If you would
-like to contribute native ARM support, please provide a pull request.
+We also support ARM platforms (aarch64 / ARM64) natively: the SIMD code is mapped directly to ARM NEON
+intrinsics, with no emulation layer or external dependency.
 
 ## Building with CMake
 
